@@ -1,0 +1,189 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+} 
+
+<style type="text/css">
+    .hidden{display:none;}
+</style>
+
+<script src="http://code.jquery.com/jquery-latest.min.js"
+        type="text/javascript"></script>
+
+
+Тестовая страничка
+
+Результат:
+<div id="result">
+</div>
+
+<table id="trecks" class="hidden">
+    <tr class="header">
+        <th>Id</th>
+        <th>Path</th>
+        <th>Upload date</th>
+    </tr>
+</table>
+
+
+
+<script language="javascript" type="text/javascript">
+
+    var ownBaseUrl = 'http://ownradio.ru/api/';
+    var baseUrl = 'api/';
+
+    $(function () {
+        //var url = //ownBaseUrl +
+        //    baseUrl +
+        //        'track/GetNextTrackID/14fe5882-bd5a-4c31-86f2-88073bd53bfc';
+
+        //doAjaxRequest(url);
+
+        var urlGetAllUsers = //ownBaseUrl +
+            baseUrl +
+            'user/GetAllUsers';
+        processUsers(urlGetAllUsers);
+
+
+        //var urlGetTracks = //ownBaseUrl +
+        //        baseUrl +
+        //        'track/GetAllTracksByUserID/067755c6-90c0-4237-992a-5ae9ffe40888';
+
+        //doAjaxRequest(urlGetTracks);
+
+        //var urlValues = //ownBaseUrl +
+        //    baseUrl +
+        //    'values';
+
+        //doAjaxRequest(urlValues);
+
+    });
+
+    function writeResult(result) {
+        $('#result').append('<p>' + result + '</p>');
+    }
+
+    function doAjaxRequest(url) {
+        $.ajax({
+            url: url,
+            method: "Get",
+            success: function (data, textStatus, jqXHR) {
+
+                if (isArray(data)) {
+
+                    writeResult('Успешно. Данные:');
+                    $.map(data, function (val, i) {
+
+                        if (typeof val === 'string' || val instanceof String) {
+                            writeResult(val);
+                        } else {
+                            var result = '';
+                            $.each(val,
+                                function (key, value) {
+                                    result += key + ": " + value + ' ';
+                                });
+
+                            writeResult(result);
+                        }
+
+                    });
+
+                } else {
+                    writeResult('Успешно ' + data);
+                }
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                if (typeof errorThrown != 'undefined' && typeof errorThrown.message != 'undefined')
+                    writeResult(errorThrown.message);
+                else
+                    writeResult(textStatus);
+            },
+        });
+    }
+
+    function isArray(data) {
+        return Object.prototype.toString.call(data) === '[object Array]';
+    }
+
+    function processUsers(url) {
+        $.ajax({
+            url: url,
+            method: "Get",
+            success: function (data, textStatus, jqXHR) {
+
+                $('#result').append('<select id="users"></select>');
+                $('#users').change(userChanged);
+
+                $.map(data, function (val, i) {
+                    $('#users').append('<option id="users" data-id="' + val.id  +'">' + val.name +'</option>');
+                });
+
+
+                userChanged();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                if (typeof errorThrown != 'undefined' && typeof errorThrown.message != 'undefined')
+                    writeResult(errorThrown.message);
+                else
+                    writeResult(textStatus);
+            },
+        });
+    }
+
+    function userChanged() {
+        var selectedUser = $("#users option:selected").data('id');
+
+        if (selectedUser)
+            getTracks(selectedUser);
+        else {
+            hideTracks();
+        }
+    }
+
+    function getTracks(userId) {
+        var url = //ownBaseUrl +
+                baseUrl +
+                'track/GetAllTracksByUserID/' + userId;
+
+        $.ajax({
+            url: url,
+            method: "Get",
+            success: function (data, textStatus, jqXHR) {
+                showTracks(data);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                if (typeof errorThrown != 'undefined' && typeof errorThrown.message != 'undefined')
+                    writeResult(errorThrown.message);
+                else
+                    writeResult(textStatus);
+            },
+        });
+    }
+
+    function showTracks(data) {
+        hideTracks();
+        if (data) {
+            var len = data.length;
+            var txt = "";
+            if (len > 0) {
+                for (var i = 0; i < len; i++) {
+                    if (data[i].id && data[i].path && data[i].uploaded) {
+                        txt += "<tr><td>" + data[i].id + "</td><td>" + data[i].path + "</td><td>" + data[i].uploaded + "</td></tr>";
+                    }
+                }
+
+                if (txt != "") {
+                    $("#trecks").append(txt).removeClass("hidden");
+                }
+            }
+        }
+    }
+
+    function hideTracks() {
+        $("#trecks").find('tr:not(.header)').remove();
+        $("#trecks").addClass("hidden");
+    }
+
+</script>

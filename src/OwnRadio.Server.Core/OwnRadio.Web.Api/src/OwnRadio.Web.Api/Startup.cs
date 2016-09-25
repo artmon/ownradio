@@ -37,7 +37,7 @@ namespace OwnRadio.Web.Api
 			services.AddMvc();
 			// Inject an implementation of ISwaggerProvider with defaulted settings applied
 			services.AddSwaggerGen();
-		}
+        }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -53,7 +53,7 @@ namespace OwnRadio.Web.Api
 			// Enable middleware to serve swagger-ui assets (HTML, JS, CSS etc.)
 			app.UseSwaggerUi();
 
-			app.UseMvc();
+			app.UseMvcWithDefaultRoute();
 		}
 	}
 }

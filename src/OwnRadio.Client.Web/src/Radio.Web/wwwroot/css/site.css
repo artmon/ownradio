@@ -132,3 +132,10 @@ footer {
 .body-content, footer {
     text-align: center;
 }
+
+
+.hidden {
+    display: none;
+}
+
+

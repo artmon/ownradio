@@ -19,7 +19,8 @@
         listedTillTheEnd: false
     };
 
-    var baseUrl = "http://radio.redoc.ru/api/TrackSource/";
+    var baseUrl = "http://ownradio.ru/api/track/";
+    var lastBaseUrl = "http://radio.redoc.ru/api/TrackSource/"; 
     var userInteracted = false;
     var isMobile = false;
     var stalledTime = 0;
@@ -41,7 +42,7 @@
     var audioSource = document.getElementById('audio-source');
     var audioLocked = false;
 
-    skipButton.click(function () {
+    skipButton.click(function() {
         if (audioLocked) {
             return;
         }
@@ -54,7 +55,7 @@
         } else {
             loadNextTrack();
         }
-    })
+    });
 
     playButton.click(function () {
         if (audioLocked) {
@@ -113,21 +114,36 @@
         soundProgress.width('100%');
     });
 
+
     function loadNextTrack() {
+
+        //Не работют ajax запросы на этот сервер, не работает прием ответа
+        var url = baseUrl + "GetNextTrackID/" + $('#userGuid').val();
         $.ajax({
-            url: baseUrl + "NextTrack",
+            url: lastBaseUrl + "NextTrack",
             method: "GET",
             data: currentTrackData,
-        }).done(playStream).fail(alert);
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (typeof errorThrown != 'undefined' && typeof errorThrown.message != 'undefined')
+                    alert(errorThrown.message);
+                else
+                    alert(textStatus);
+            },
+            }).done(playStream).fail(alert);
     }
 
     function playStream(trackData) {
+
         if (trackData.TrackId) {
             currentTrackData.lastTrackId = trackData.TrackId;
             currentTrackData.lastTrackMethod = trackData.Method;
-        }
+        } 
 
-        var url = baseUrl + "Play?" + $.param({ trackId: currentTrackData.lastTrackId });
+        //запустить с нового сервиса
+        var url = baseUrl + "GetTrackByID/e923cf97-009e-4d9d-9b70-f793ac2b9006";
+
+        url = lastBaseUrl + "Play?" + $.param({ trackId: currentTrackData.lastTrackId });
+
         audioSource.src = url;
         audio.ontimeupdate = audioProgress;
 
@@ -155,6 +171,7 @@
                 audioLocked = false;
             });
         }
+
     };
 
     //function setTrackStatus(status) {

@@ -1,0 +1,114 @@
+﻿<label>Пользователи:</label>
+
+<div id="result">
+</div>
+
+<table id="trecks" class="hidden">
+    <tr class="header">
+        <th>Id</th>
+        <th>Path</th>
+        <th>Upload date</th>
+    </tr>
+</table>
+
+
+@section scripts {
+    <script language="javascript" type="text/javascript">
+
+        var ownBaseUrl = 'http://ownradio.ru/api/';
+
+        $(function () {
+            var urlGetAllUsers = ownBaseUrl +
+                'user/GetAllUsers';
+            processUsers(urlGetAllUsers);
+
+        });
+
+        function processUsers(url) {
+            $.ajax({
+                url: url,
+                method: "Get",
+                success: function (data, textStatus, jqXHR) {
+
+                    $('#result').append('<select id="users"></select>');
+                    $('#users').change(userChanged);
+
+                    $.map(data,
+                        function (val, i) {
+                            $('#users').append('<option id="users" data-id="' + val.id + '">' + val.name + '</option>');
+                        });
+
+
+                    userChanged();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (typeof errorThrown != 'undefined' && typeof errorThrown.message != 'undefined')
+                        alert(errorThrown.message);
+                    else
+                        alert(textStatus);
+                },
+            });
+        }
+
+        function userChanged() {
+            var selectedUser = $("#users option:selected").data('id');
+
+            if (selectedUser)
+                getTracks(selectedUser);
+            else {
+                hideTracks();
+            }
+        }
+
+        function getTracks(userId) {
+            var url = ownBaseUrl +
+                'track/GetAllTracksByUserID/' +
+                userId;
+
+            $.ajax({
+                url: url,
+                method: "Get",
+                success: function (data, textStatus, jqXHR) {
+                    showTracks(data);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (typeof errorThrown != 'undefined' && typeof errorThrown.message != 'undefined')
+                        alert(errorThrown.message);
+                    else
+                        alert(textStatus);
+                },
+            });
+        }
+
+        function showTracks(data) {
+            hideTracks();
+            if (data) {
+                var len = data.length;
+                var txt = "";
+                if (len > 0) {
+                    for (var i = 0; i < len; i++) {
+                        if (data[i].id && data[i].path && data[i].uploaded) {
+                            txt += "<tr><td>" +
+                                data[i].id +
+                                "</td><td>" +
+                                data[i].path +
+                                "</td><td>" +
+                                data[i].uploaded +
+                                "</td></tr>";
+                        }
+                    }
+
+                    if (txt != "") {
+                        $("#trecks").append(txt).removeClass("hidden");
+                    }
+                }
+            }
+        }
+
+        function hideTracks() {
+            $("#trecks").find('tr:not(.header)').remove();
+            $("#trecks").addClass("hidden");
+        }
+
+    </script>
+}

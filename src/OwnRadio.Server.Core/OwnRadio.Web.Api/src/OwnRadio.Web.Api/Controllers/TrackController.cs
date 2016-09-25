@@ -3,7 +3,9 @@ using Microsoft.Extensions.Options;
 using OwnRadio.Web.Api.Infrastructure;
 using OwnRadio.Web.Api.Models;
 using System;
+using System.Collections.Generic;
 using System.Net;
+using OwnRadio.Web.Api.Repository;
 
 namespace OwnRadio.Web.Api.Controllers
 {
@@ -22,17 +24,19 @@ namespace OwnRadio.Web.Api.Controllers
 		[HttpGet("{deviceID}")]
 		public Guid GetNextTrackID(Guid deviceID)
 		{
-			var track = new Track(settings.connectionString);
-			return track.GetNextTrackID(deviceID);
+			var track = new TrackRepository(settings.connectionString);
+		    var nestTrack = track.GetNextTrackID(deviceID);
+        
+		    return nestTrack;
 		}
 
-		// Возвращает трек (поток audio/mpeg) по его идентификатору
-		// GET api/track/GetNextTrackID/12345678-1234-1234-1234-123456789012
-		[HttpGet("{trackID}")]
+        // Возвращает трек (поток audio/mpeg) по его идентификатору
+        // GET api/track/GetTrackByID/12345678-1234-1234-1234-123456789012
+        [HttpGet("{trackID}")]
 		public IActionResult GetTrackByID(Guid trackID)
 		{
 			// Получаем путь к треку
-			var track = new Track(settings.connectionString);
+			var track = new TrackRepository(settings.connectionString);
 			var path = track.GetTrackPath(trackID);
 			// Создаем поток из трека
 			var stream = System.IO.File.OpenRead(path);
@@ -47,9 +51,22 @@ namespace OwnRadio.Web.Api.Controllers
 		public int SetStatusTrack(Guid DeviceID, Guid TrackID, int IsListen, string DateTimeListen)
 		{
 			// Получаем путь к треку
-			var track = new Track(settings.connectionString);
+			var track = new TrackRepository(settings.connectionString);
 			var rowsCount = track.SetStatusTrack(DeviceID, TrackID, IsListen, DateTime.Parse(DateTimeListen));
 			return rowsCount;
 		}
-	}
+
+
+        // Возвращает все треки по его идентификатору пользователя
+        // GET api/track/GetAllTracksByUserID/12345678-1234-1234-1234-123456789012
+        [HttpGet("{userID}")]
+        public List<Track> GetAllTracksByUserID(Guid userID)
+        {
+            var track = new TrackRepository(settings.connectionString);
+            var result = track.GetAllTracksByUserID(userID);
+
+            return result;
+        }
+
+    }
 }
