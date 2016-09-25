@@ -4,15 +4,15 @@ using System.Data;
 using Npgsql;
 using OwnRadio.Web.Api.Models;
 
-namespace OwnRadio.Web.Api.Repository
+namespace OwnRadio.Web.Api.Repositories
 {
-	public class TrackRepository
+	public class TracksRepository
     {
 		// Строка подключения к БД
 		private string connectionString;
 
 		// Конструктор - инициализация данных
-		public TrackRepository(string connectionString)
+		public TracksRepository(string connectionString)
 		{
 			this.connectionString = connectionString;
 		}

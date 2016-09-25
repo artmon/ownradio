@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Npgsql;
 using OwnRadio.Web.Api.Models;
 
-namespace OwnRadio.Web.Api.Repository
+namespace OwnRadio.Web.Api.Repositories
 {
     public class UsersRepository
     {

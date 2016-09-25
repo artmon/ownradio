@@ -5,7 +5,7 @@ using OwnRadio.Web.Api.Models;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using OwnRadio.Web.Api.Repository;
+using OwnRadio.Web.Api.Repositories;
 
 namespace OwnRadio.Web.Api.Controllers
 {
@@ -24,7 +24,7 @@ namespace OwnRadio.Web.Api.Controllers
 		[HttpGet("{deviceID}")]
 		public Guid GetNextTrackID(Guid deviceID)
 		{
-			var track = new TrackRepository(settings.connectionString);
+			var track = new TracksRepository(settings.connectionString);
 		    var nestTrack = track.GetNextTrackID(deviceID);
         
 		    return nestTrack;
@@ -36,7 +36,7 @@ namespace OwnRadio.Web.Api.Controllers
 		public IActionResult GetTrackByID(Guid trackID)
 		{
 			// Получаем путь к треку
-			var track = new TrackRepository(settings.connectionString);
+			var track = new TracksRepository(settings.connectionString);
 			var path = track.GetTrackPath(trackID);
 			// Создаем поток из трека
 			var stream = System.IO.File.OpenRead(path);
@@ -51,7 +51,7 @@ namespace OwnRadio.Web.Api.Controllers
 		public int SetStatusTrack(Guid DeviceID, Guid TrackID, int IsListen, string DateTimeListen)
 		{
 			// Получаем путь к треку
-			var track = new TrackRepository(settings.connectionString);
+			var track = new TracksRepository(settings.connectionString);
 			var rowsCount = track.SetStatusTrack(DeviceID, TrackID, IsListen, DateTime.Parse(DateTimeListen));
 			return rowsCount;
 		}
@@ -62,7 +62,7 @@ namespace OwnRadio.Web.Api.Controllers
         [HttpGet("{userID}")]
         public List<Track> GetAllTracksByUserID(Guid userID)
         {
-            var track = new TrackRepository(settings.connectionString);
+            var track = new TracksRepository(settings.connectionString);
             var result = track.GetAllTracksByUserID(userID);
 
             return result;

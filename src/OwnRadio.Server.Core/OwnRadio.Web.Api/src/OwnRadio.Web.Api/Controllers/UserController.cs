@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using OwnRadio.Web.Api.Infrastructure;
 using OwnRadio.Web.Api.Models;
-using OwnRadio.Web.Api.Repository;
+using OwnRadio.Web.Api.Repositories;
 
 namespace OwnRadio.Web.Api.Controllers
 {
